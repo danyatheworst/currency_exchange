@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CurrencyRepository extends BaseRepository {
 
-    public List<Currency> get() throws SQLException, ClassNotFoundException {
+    public List<Currency> getAll() throws SQLException, ClassNotFoundException {
         this.makeConnection();
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery("select * from Currencies");
@@ -26,5 +26,18 @@ public class CurrencyRepository extends BaseRepository {
             currencies.add(currency);
         }
         return currencies;
+    }
+
+    public Currency get(String code) throws SQLException, ClassNotFoundException {
+        this.makeConnection();
+        Statement statement = connection.createStatement();
+        code = "'" + code.toUpperCase() + "'";
+        ResultSet rs = statement.executeQuery("select * from Currencies where Code == " + code);
+
+        return new Currency(
+                rs.getInt("id"),
+                rs.getString("code"),
+                rs.getString("fullName"),
+                rs.getString("sign"));
     }
 }
