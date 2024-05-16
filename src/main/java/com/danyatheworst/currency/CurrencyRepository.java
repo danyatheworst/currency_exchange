@@ -40,4 +40,24 @@ public class CurrencyRepository extends BaseRepository {
                 rs.getString("fullName"),
                 rs.getString("sign"));
     }
+
+    public int create(Currency currency) throws SQLException, ClassNotFoundException {
+        this.makeConnection();
+        Statement statement = connection.createStatement();
+        String code = "'" + currency.code + "'";
+        String fullName = "'" + currency.fullName + "'";
+        String sign = "'" + currency.sign + "'";
+        int affectedRows = statement.executeUpdate(
+                "insert into Currencies (code, fullName, sign) VALUES (" + code + ", " + fullName + ", " + sign + ")"
+        );
+
+        if (affectedRows > 0) {
+            ResultSet resultSet = statement.executeQuery("select last_insert_rowid()");
+            if (resultSet.next()) {
+                int lastInsertId = resultSet.getInt(1);
+                return lastInsertId;
+            }
+        }
+        return 2222;
+    }
 }
