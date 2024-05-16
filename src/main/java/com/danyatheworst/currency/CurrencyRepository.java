@@ -31,7 +31,7 @@ public class CurrencyRepository extends BaseRepository {
     public Currency get(String code) throws SQLException, ClassNotFoundException {
         this.makeConnection();
         Statement statement = connection.createStatement();
-        code = "'" + code.toUpperCase() + "'";
+        code = "'" + code + "'";
         ResultSet rs = statement.executeQuery("select * from Currencies where Code == " + code);
 
         return new Currency(
