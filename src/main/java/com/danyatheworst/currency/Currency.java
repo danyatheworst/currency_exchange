@@ -1,7 +1,7 @@
 package main.java.com.danyatheworst.currency;
 
 public class Currency {
-    private final Integer id;
+    public Integer id;
     public final String code;
     public final String fullName;
     public final String sign;

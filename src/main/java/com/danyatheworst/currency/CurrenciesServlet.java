@@ -41,10 +41,15 @@ public class CurrenciesServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
 
-        Currency newCurrency = new Currency(null, req.getParameter("name"), req.getParameter("code"), req.getParameter("sign"));
+        //TODO: validation
+        Currency newCurrency = new Currency(
+                null, req.getParameter("name"),
+                req.getParameter("code"),
+                req.getParameter("sign")
+        );
         try {
-            int createdCurrency = this.currencyRepository.create(newCurrency);
-            String currenciesJson = this.gson.toJson(createdCurrency);
+            newCurrency.id = this.currencyRepository.create(newCurrency);
+            String currenciesJson = this.gson.toJson(newCurrency);
             PrintWriter printWriter = resp.getWriter();
 
             printWriter.write(currenciesJson);
