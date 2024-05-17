@@ -14,17 +14,18 @@ import java.sql.SQLException;
 import java.util.List;
 
 
-
 @WebServlet(name = "CurrenciesServlet", urlPatterns = {"/currencies"})
 public class CurrenciesServlet extends HttpServlet {
+    private final CurrencyRepository currencyRepository = new CurrencyRepository();
+    private final Gson gson = new Gson();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         try {
-            List<Currency> currencies = new CurrencyRepository().getAll();
-            String currenciesJson = new Gson().toJson(currencies);
+            List<Currency> currencies = this.currencyRepository.getAll();
+            String currenciesJson = this.gson.toJson(currencies);
             PrintWriter printWriter = resp.getWriter();
 
             printWriter.write(currenciesJson);
@@ -40,15 +41,10 @@ public class CurrenciesServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
 
-        Currency newCurrency = new Currency(
-                null,
-                req.getParameter("name"),
-                req.getParameter("code"),
-                req.getParameter("sign")
-        );
+        Currency newCurrency = new Currency(null, req.getParameter("name"), req.getParameter("code"), req.getParameter("sign"));
         try {
-            int createdCurrency = new CurrencyRepository().create(newCurrency);
-            String currenciesJson = new Gson().toJson(createdCurrency);
+            int createdCurrency = this.currencyRepository.create(newCurrency);
+            String currenciesJson = this.gson.toJson(createdCurrency);
             PrintWriter printWriter = resp.getWriter();
 
             printWriter.write(currenciesJson);

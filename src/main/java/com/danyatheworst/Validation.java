@@ -7,7 +7,7 @@ public class Validation {
             return false;
         }
         for (char ch : code.toCharArray()) {
-            if (Character.UnicodeBlock.of(ch) != Character.UnicodeBlock.BASIC_LATIN) {
+            if (!Character.isLetter(ch) || Character.UnicodeBlock.of(ch) != Character.UnicodeBlock.BASIC_LATIN) {
                return false;
             }
         }

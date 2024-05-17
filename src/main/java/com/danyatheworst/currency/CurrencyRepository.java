@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CurrencyRepository extends BaseRepository {
 
@@ -28,17 +29,20 @@ public class CurrencyRepository extends BaseRepository {
         return currencies;
     }
 
-    public Currency get(String code) throws SQLException, ClassNotFoundException {
+    public Optional<Currency> getBy(String code) throws SQLException, ClassNotFoundException {
         this.makeConnection();
         Statement statement = connection.createStatement();
         code = "'" + code + "'";
         ResultSet rs = statement.executeQuery("select * from Currencies where Code == " + code);
 
-        return new Currency(
-                rs.getInt("id"),
-                rs.getString("code"),
-                rs.getString("fullName"),
-                rs.getString("sign"));
+        if (rs.next()) {
+            return Optional.of(new Currency(
+                    rs.getInt("id"),
+                    rs.getString("code"),
+                    rs.getString("fullName"),
+                    rs.getString("sign")));
+        }
+        return Optional.empty();
     }
 
     public int create(Currency currency) throws SQLException, ClassNotFoundException {
@@ -54,8 +58,7 @@ public class CurrencyRepository extends BaseRepository {
         if (affectedRows > 0) {
             ResultSet resultSet = statement.executeQuery("select last_insert_rowid()");
             if (resultSet.next()) {
-                int lastInsertId = resultSet.getInt(1);
-                return lastInsertId;
+                return resultSet.getInt(1);
             }
         }
         return 2222;
