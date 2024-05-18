@@ -41,7 +41,7 @@ public class CurrencyServlet extends HttpServlet {
             PrintWriter printWriter = resp.getWriter();
             printWriter.write(this.gson.toJson(currency));
             printWriter.close();
-        } catch (SQLException | IOException | ClassNotFoundException e) {
+        } catch (SQLException | IOException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().print(gson.toJson(new ErrorResponse(e.getMessage())));
         }

@@ -1,15 +1,14 @@
 package main.java.com.danyatheworst.currency;
 
 import com.google.gson.Gson;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import main.java.com.danyatheworst.ErrorResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class CurrenciesServlet extends HttpServlet {
 
             printWriter.write(currenciesJson);
             printWriter.close();
-        } catch (SQLException | ClassNotFoundException | IOException e) {
+        } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -47,15 +46,19 @@ public class CurrenciesServlet extends HttpServlet {
                 req.getParameter("code"),
                 req.getParameter("sign")
         );
+
+        PrintWriter printWriter = resp.getWriter();
         try {
             newCurrency.id = this.currencyRepository.create(newCurrency);
             String currenciesJson = this.gson.toJson(newCurrency);
-            PrintWriter printWriter = resp.getWriter();
-
+            resp.setStatus(HttpServletResponse.SC_CREATED);
             printWriter.write(currenciesJson);
+            System.out.println("try");
+        } catch (SQLException e) {
+//            resp.setStatus(e.ge);
+            printWriter.write(this.gson.toJson(new ErrorResponse(e.getMessage())));
+        }  finally {
             printWriter.close();
-        } catch (SQLException | ClassNotFoundException | IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }
