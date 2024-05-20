@@ -7,10 +7,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import main.java.com.danyatheworst.ErrorResponse;
 import main.java.com.danyatheworst.Validation;
+import main.java.com.danyatheworst.exceptions.UnknownException;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.Optional;
 
 @WebServlet(name = "CurrencyServlet", urlPatterns = {"/currency/*"})
@@ -39,12 +39,12 @@ public class CurrencyServlet extends HttpServlet {
             }
 
             PrintWriter printWriter = resp.getWriter();
+            //TODO: map currency to currencyResponse
             printWriter.write(this.gson.toJson(currency));
             printWriter.close();
-        } catch (SQLException | IOException e) {
+        } catch (UnknownException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().print(gson.toJson(new ErrorResponse(e.getMessage())));
         }
     }
-
 }
