@@ -1,17 +1,26 @@
 package main.java.com.danyatheworst;
 
+import main.java.com.danyatheworst.exceptions.InvalidCurrencyCodeException;
+import main.java.com.danyatheworst.exceptions.ParameterMissingException;
+
+import java.util.Enumeration;
+
 public class Validation {
 
-    public static boolean isCodeValid(String code) {
+    public static void isCodeValid(String code) throws InvalidCurrencyCodeException {
         if (code == null || code.length() != 3) {
-            return false;
+            throw new InvalidCurrencyCodeException(code);
         }
         for (char ch : code.toCharArray()) {
             if (!Character.isLetter(ch) || Character.UnicodeBlock.of(ch) != Character.UnicodeBlock.BASIC_LATIN) {
-               return false;
+                throw new InvalidCurrencyCodeException(code);
             }
         }
-        return true;
     }
 
+    public static void parameterPresence(String parameter, String name) throws ParameterMissingException {
+        if (parameter.isBlank()) {
+            throw new ParameterMissingException(name);
+        }
+    }
 }

@@ -5,12 +5,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import main.java.com.danyatheworst.exceptions.CurrencyAlreadyExistsException;
+import main.java.com.danyatheworst.Validation;
+import main.java.com.danyatheworst.exceptions.ApplicationException;
 import main.java.com.danyatheworst.ErrorResponse;
+import main.java.com.danyatheworst.exceptions.ParameterMissingException;
 import main.java.com.danyatheworst.exceptions.UnknownException;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.List;
 
 
@@ -43,27 +46,26 @@ public class CurrenciesServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
 
-        //TODO: validation
-        Currency newCurrency = new Currency(
-                null, req.getParameter("name"),
-                req.getParameter("code"),
-                req.getParameter("sign")
-        );
-
         PrintWriter printWriter = resp.getWriter();
+        String code = req.getParameter("code");
+        String name = req.getParameter("name");
+        String sign = req.getParameter("sign");
         try {
+            Validation.parameterPresence(code, "Code");
+            Validation.parameterPresence(name, "Name");
+            Validation.parameterPresence(sign, "Sign");
+            Validation.isCodeValid(code);
+
+            Currency newCurrency = new Currency(null, code, name, sign);
             newCurrency.id = this.currencyRepository.create(newCurrency);
             //TODO: map newCurrency to currencyResponse
             String currenciesJson = this.gson.toJson(newCurrency);
             resp.setStatus(HttpServletResponse.SC_CREATED);
             printWriter.write(currenciesJson);
-        } catch (CurrencyAlreadyExistsException e) {
-            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+        } catch (ApplicationException e) {
+            resp.setStatus(e.status);
             printWriter.write(this.gson.toJson(new ErrorResponse(e.getMessage())));
-        } catch (UnknownException e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            printWriter.write(this.gson.toJson(new ErrorResponse(e.getMessage())));
-        }  finally {
+        } finally {
             printWriter.close();
         }
     }

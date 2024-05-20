@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import main.java.com.danyatheworst.ErrorResponse;
 import main.java.com.danyatheworst.Validation;
+import main.java.com.danyatheworst.exceptions.ApplicationException;
 import main.java.com.danyatheworst.exceptions.UnknownException;
 
 import java.io.IOException;
@@ -22,15 +23,10 @@ public class CurrencyServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
-
-        String code = req.getPathInfo().replaceAll("/", "");
-        if (!Validation.isCodeValid(code)) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().print(gson.toJson(new ErrorResponse("Invalid currency code")));
-            return;
-        }
-
         try {
+            String code = req.getPathInfo().replaceAll("/", "");
+            Validation.isCodeValid(code);
+
             Optional<Currency> currency = this.currencyRepository.getBy(code.toUpperCase());
             if (currency.isEmpty()) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -42,8 +38,8 @@ public class CurrencyServlet extends HttpServlet {
             //TODO: map currency to currencyResponse
             printWriter.write(this.gson.toJson(currency));
             printWriter.close();
-        } catch (UnknownException e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (ApplicationException e) {
+            resp.setStatus(e.status);
             resp.getWriter().print(gson.toJson(new ErrorResponse(e.getMessage())));
         }
     }
