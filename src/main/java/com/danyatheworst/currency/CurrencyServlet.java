@@ -8,6 +8,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import main.java.com.danyatheworst.ErrorResponse;
 import main.java.com.danyatheworst.Validation;
 import main.java.com.danyatheworst.exceptions.ApplicationException;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
+import org.modelmapper.TypeMap;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,6 +20,7 @@ import java.util.Optional;
 public class CurrencyServlet extends HttpServlet {
     private final CurrencyRepository currencyRepository = new CurrencyRepository();
     private final Gson gson = new Gson();
+    private final ModelMapper modelMapper = new ModelMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -31,8 +35,8 @@ public class CurrencyServlet extends HttpServlet {
                 resp.getWriter().print(gson.toJson(new ErrorResponse("Such currency has not been found")));
                 return;
             }
-            //TODO: map currency to currencyResponse
-            printWriter.write(this.gson.toJson(currency));
+            CurrencyResponse currencyResponse = this.modelMapper.map(currency.get(), CurrencyResponse.class);
+            printWriter.write(this.gson.toJson(currencyResponse));
         } catch (ApplicationException e) {
             resp.setStatus(e.status);
             printWriter.print(gson.toJson(new ErrorResponse(e.getMessage())));

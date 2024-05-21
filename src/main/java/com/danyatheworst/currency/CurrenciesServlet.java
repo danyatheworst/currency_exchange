@@ -9,9 +9,11 @@ import main.java.com.danyatheworst.Validation;
 import main.java.com.danyatheworst.exceptions.ApplicationException;
 import main.java.com.danyatheworst.ErrorResponse;
 import main.java.com.danyatheworst.exceptions.UnknownException;
+import org.modelmapper.ModelMapper;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -19,15 +21,16 @@ import java.util.List;
 public class CurrenciesServlet extends HttpServlet {
     private final CurrencyRepository currencyRepository = new CurrencyRepository();
     private final Gson gson = new Gson();
+    private final ModelMapper modelMapper = new ModelMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         PrintWriter printWriter = resp.getWriter();
         try {
             List<Currency> currencies = this.currencyRepository.getAll();
-            //TODO: map to currencyResponse
-            String currenciesJson = this.gson.toJson(currencies);
-            printWriter.write(currenciesJson);
+            List<CurrencyResponse> currenciesResponse =
+                    Arrays.asList(this.modelMapper.map(currencies,  CurrencyResponse[].class));
+            printWriter.write(this.gson.toJson(currenciesResponse));
         } catch (UnknownException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             printWriter.write(this.gson.toJson(new ErrorResponse(e.getMessage())));
@@ -50,10 +53,9 @@ public class CurrenciesServlet extends HttpServlet {
 
             Currency newCurrency = new Currency(null, code, name, sign);
             newCurrency.id = this.currencyRepository.create(newCurrency);
-            //TODO: map newCurrency to currencyResponse
-            String currenciesJson = this.gson.toJson(newCurrency);
+            CurrencyResponse currencyResponse = this.modelMapper.map(newCurrency, CurrencyResponse.class);
             resp.setStatus(HttpServletResponse.SC_CREATED);
-            printWriter.write(currenciesJson);
+            printWriter.write(this.gson.toJson(currencyResponse));
         } catch (ApplicationException e) {
             resp.setStatus(e.status);
             printWriter.write(this.gson.toJson(new ErrorResponse(e.getMessage())));

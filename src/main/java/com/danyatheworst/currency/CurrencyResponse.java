@@ -2,14 +2,23 @@ package main.java.com.danyatheworst.currency;
 
 public class CurrencyResponse {
     public int id;
-    public final String code;
-    public final String name;
-    public final String sign;
+    public String code;
+    public String name;
+    public String sign;
 
-    public CurrencyResponse(Integer id, String code, String name, String sign) {
+    public void setId(int id) {
         this.id = id;
-        this.code = code;
+    }
+
+    public void setName(String name) {
         this.name = name;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public void setSign(String sign) {
         this.sign = sign;
     }
 }
