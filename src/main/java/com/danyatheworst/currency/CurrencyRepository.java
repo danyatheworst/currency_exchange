@@ -20,7 +20,6 @@ public class CurrencyRepository {
         }
     }
 
-
     public List<Currency> getAll() {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("select * from Currencies");

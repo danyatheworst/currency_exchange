@@ -3,8 +3,6 @@ package main.java.com.danyatheworst;
 import main.java.com.danyatheworst.exceptions.InvalidCurrencyCodeException;
 import main.java.com.danyatheworst.exceptions.ParameterMissingException;
 
-import java.util.Enumeration;
-
 public class Validation {
 
     public static void isCodeValid(String code) throws InvalidCurrencyCodeException {

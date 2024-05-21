@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import main.java.com.danyatheworst.ErrorResponse;
 import main.java.com.danyatheworst.Validation;
 import main.java.com.danyatheworst.exceptions.ApplicationException;
-import main.java.com.danyatheworst.exceptions.UnknownException;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,8 +20,7 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
+        PrintWriter printWriter = resp.getWriter();
         try {
             String code = req.getPathInfo().replaceAll("/", "");
             Validation.isCodeValid(code);
@@ -33,14 +31,13 @@ public class CurrencyServlet extends HttpServlet {
                 resp.getWriter().print(gson.toJson(new ErrorResponse("Such currency has not been found")));
                 return;
             }
-
-            PrintWriter printWriter = resp.getWriter();
             //TODO: map currency to currencyResponse
             printWriter.write(this.gson.toJson(currency));
-            printWriter.close();
         } catch (ApplicationException e) {
             resp.setStatus(e.status);
-            resp.getWriter().print(gson.toJson(new ErrorResponse(e.getMessage())));
+            printWriter.print(gson.toJson(new ErrorResponse(e.getMessage())));
+        } finally {
+            printWriter.close();
         }
     }
 }
