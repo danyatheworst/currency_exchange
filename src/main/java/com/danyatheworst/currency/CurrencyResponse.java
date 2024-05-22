@@ -1,10 +1,10 @@
 package main.java.com.danyatheworst.currency;
 
 public class CurrencyResponse {
-    public int id;
-    public String code;
-    public String name;
-    public String sign;
+    private int id;
+    private String code;
+    private String name;
+    private String sign;
 
     public void setId(int id) {
         this.id = id;

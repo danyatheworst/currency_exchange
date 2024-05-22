@@ -1,5 +1,6 @@
 package main.java.com.danyatheworst.currency;
 
+import main.java.com.danyatheworst.BaseRepository;
 import main.java.com.danyatheworst.exceptions.CurrencyAlreadyExistsException;
 import main.java.com.danyatheworst.DataSource;
 import main.java.com.danyatheworst.exceptions.UnknownException;
@@ -9,17 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CurrencyRepository {
-    private static final Connection connection;
-
-    static {
-        try {
-            connection = DataSource.getConnection();
-        } catch (SQLException e) {
-            throw new UnknownException();
-        }
-    }
-
+public class CurrencyRepository extends BaseRepository {
     public List<Currency> getAll() {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("select * from Currencies");
