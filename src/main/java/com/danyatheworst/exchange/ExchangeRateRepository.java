@@ -1,6 +1,7 @@
 package main.java.com.danyatheworst.exchange;
 
 import main.java.com.danyatheworst.BaseRepository;
+import main.java.com.danyatheworst.currency.CrudRepository;
 import main.java.com.danyatheworst.currency.Currency;
 import main.java.com.danyatheworst.exceptions.UnknownException;
 
@@ -10,8 +11,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExchangeRateRepository extends BaseRepository {
-    public List<ExchangeRate> getAll() {
+public class ExchangeRateRepository extends BaseRepository implements CrudRepository<ExchangeRate> {
+    public List<ExchangeRate> findAll() {
         try {
             String sql =
                     """
@@ -43,6 +44,11 @@ public class ExchangeRateRepository extends BaseRepository {
         }
 
     }
+
+    public int create(ExchangeRate currency) {
+        return 0;
+    }
+
     private static ExchangeRate parseExchangeRate(ResultSet resultSet) throws SQLException {
         return new ExchangeRate(
                 resultSet.getInt("id"),

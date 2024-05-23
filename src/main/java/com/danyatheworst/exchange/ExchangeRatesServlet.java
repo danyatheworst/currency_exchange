@@ -1,7 +1,6 @@
 package main.java.com.danyatheworst.exchange;
 
 import com.google.gson.Gson;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +18,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         PrintWriter printWriter = resp.getWriter();
         try {
-            List<ExchangeRate> exchangeRates = this.exchangeRateRepository.getAll();
+            List<ExchangeRate> exchangeRates = this.exchangeRateRepository.findAll();
             //TODO:map to response and return;
             resp.setStatus(HttpServletResponse.SC_OK);
             printWriter.write(this.gson.toJson(exchangeRates));

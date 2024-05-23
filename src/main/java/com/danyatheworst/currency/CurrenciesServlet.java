@@ -27,7 +27,7 @@ public class CurrenciesServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         PrintWriter printWriter = resp.getWriter();
         try {
-            List<Currency> currencies = this.currencyRepository.getAll();
+            List<Currency> currencies = this.currencyRepository.findAll();
             List<CurrencyResponse> currenciesResponse =
                     Arrays.asList(this.modelMapper.map(currencies,  CurrencyResponse[].class));
             printWriter.write(this.gson.toJson(currenciesResponse));
@@ -51,7 +51,7 @@ public class CurrenciesServlet extends HttpServlet {
             Validation.parameterPresence(sign, "Sign");
             Validation.isCodeValid(code);
 
-            Currency newCurrency = new Currency(null, code, name, sign);
+            Currency newCurrency = new Currency(code, name, sign);
             newCurrency.id = this.currencyRepository.create(newCurrency);
             CurrencyResponse currencyResponse = this.modelMapper.map(newCurrency, CurrencyResponse.class);
             resp.setStatus(HttpServletResponse.SC_CREATED);

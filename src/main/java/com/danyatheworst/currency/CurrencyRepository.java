@@ -2,7 +2,6 @@ package main.java.com.danyatheworst.currency;
 
 import main.java.com.danyatheworst.BaseRepository;
 import main.java.com.danyatheworst.exceptions.CurrencyAlreadyExistsException;
-import main.java.com.danyatheworst.DataSource;
 import main.java.com.danyatheworst.exceptions.UnknownException;
 
 import java.sql.*;
@@ -10,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CurrencyRepository extends BaseRepository {
-    public List<Currency> getAll() {
+public class CurrencyRepository extends BaseRepository implements CrudRepository<Currency> {
+    public List<Currency> findAll() {
         try (PreparedStatement preparedStatement = connection.prepareStatement("select * from Currencies");) {
             ResultSet rs = preparedStatement.executeQuery();
 
@@ -32,7 +31,7 @@ public class CurrencyRepository extends BaseRepository {
         }
     }
 
-    public Optional<Currency> getBy(String code) {
+    public Optional<Currency> findByCode(String code) {
         try(PreparedStatement preparedStatement = connection.prepareStatement(
                 "select * from Currencies where Code = ?"
         );) {
@@ -63,9 +62,8 @@ public class CurrencyRepository extends BaseRepository {
             preparedStatement.executeUpdate();
             ResultSet rs = preparedStatement.getGeneratedKeys();
             rs.next();
-            int id = rs.getInt(1);
 
-            return id;
+            return rs.getInt(1);
         } catch (SQLException e) {
             if (e.getMessage().contains("UNIQUE constraint failed")) {
                 throw new CurrencyAlreadyExistsException();

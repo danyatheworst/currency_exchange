@@ -9,8 +9,6 @@ import main.java.com.danyatheworst.ErrorResponse;
 import main.java.com.danyatheworst.Validation;
 import main.java.com.danyatheworst.exceptions.ApplicationException;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
-import org.modelmapper.TypeMap;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -29,7 +27,7 @@ public class CurrencyServlet extends HttpServlet {
             String code = req.getPathInfo().replaceAll("/", "");
             Validation.isCodeValid(code);
 
-            Optional<Currency> currency = this.currencyRepository.getBy(code.toUpperCase());
+            Optional<Currency> currency = this.currencyRepository.findByCode(code.toUpperCase());
             if (currency.isEmpty()) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 resp.getWriter().print(gson.toJson(new ErrorResponse("Such currency has not been found")));
