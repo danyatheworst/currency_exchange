@@ -22,24 +22,17 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        PrintWriter printWriter = resp.getWriter();
         try {
             String code = req.getPathInfo().replaceAll("/", "");
             Validation.isCodeValid(code);
 
-            Optional<Currency> currency = this.currencyRepository.findByCode(code.toUpperCase());
-            if (currency.isEmpty()) {
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.getWriter().print(gson.toJson(new ErrorResponse("Such currency has not been found")));
-                return;
-            }
-            CurrencyResponse currencyResponse = this.modelMapper.map(currency.get(), CurrencyResponse.class);
-            printWriter.write(this.gson.toJson(currencyResponse));
+            Currency currency = this.currencyRepository.findByCode(code.toUpperCase())
+                    .orElseThrow(() -> new ApplicationException("Currency with code " + code + " not found", 404));
+
+            this.gson.toJson(this.modelMapper.map(currency, CurrencyResponse.class), resp.getWriter());
         } catch (ApplicationException e) {
             resp.setStatus(e.status);
-            printWriter.print(gson.toJson(new ErrorResponse(e.getMessage())));
-        } finally {
-            printWriter.close();
+            this.gson.toJson(new ErrorResponse(e.getMessage()), resp.getWriter());
         }
     }
 }

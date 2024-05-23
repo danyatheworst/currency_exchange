@@ -25,23 +25,20 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        PrintWriter printWriter = resp.getWriter();
         try {
             List<Currency> currencies = this.currencyRepository.findAll();
             List<CurrencyResponse> currenciesResponse =
                     Arrays.asList(this.modelMapper.map(currencies,  CurrencyResponse[].class));
-            printWriter.write(this.gson.toJson(currenciesResponse));
+            resp.setStatus(HttpServletResponse.SC_OK);
+            this.gson.toJson(currenciesResponse, resp.getWriter());
         } catch (UnknownException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            printWriter.write(this.gson.toJson(new ErrorResponse(e.getMessage())));
-        } finally {
-            printWriter.close();
+            this.gson.toJson(new ErrorResponse(e.getMessage()), resp.getWriter());
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        PrintWriter printWriter = resp.getWriter();
         String code = req.getParameter("code");
         String name = req.getParameter("name");
         String sign = req.getParameter("sign");
@@ -55,12 +52,10 @@ public class CurrenciesServlet extends HttpServlet {
             newCurrency.id = this.currencyRepository.create(newCurrency);
             CurrencyResponse currencyResponse = this.modelMapper.map(newCurrency, CurrencyResponse.class);
             resp.setStatus(HttpServletResponse.SC_CREATED);
-            printWriter.write(this.gson.toJson(currencyResponse));
+            this.gson.toJson(currencyResponse, resp.getWriter());
         } catch (ApplicationException e) {
             resp.setStatus(e.status);
-            printWriter.write(this.gson.toJson(new ErrorResponse(e.getMessage())));
-        } finally {
-            printWriter.close();
+            this.gson.toJson(new ErrorResponse(e.getMessage()), resp.getWriter());
         }
     }
 }
