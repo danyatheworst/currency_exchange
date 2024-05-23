@@ -12,8 +12,7 @@ import java.util.Optional;
 
 public class CurrencyRepository extends BaseRepository {
     public List<Currency> getAll() {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement("select * from Currencies");
+        try (PreparedStatement preparedStatement = connection.prepareStatement("select * from Currencies");) {
             ResultSet rs = preparedStatement.executeQuery();
 
             List<Currency> currencies = new ArrayList<>();
@@ -26,18 +25,17 @@ public class CurrencyRepository extends BaseRepository {
                 );
                 currencies.add(currency);
             }
-            preparedStatement.close();
             return currencies;
         } catch (SQLException e) {
             throw new UnknownException();
+
         }
     }
 
     public Optional<Currency> getBy(String code) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "select * from Currencies where Code = ?"
-            );
+        try(PreparedStatement preparedStatement = connection.prepareStatement(
+                "select * from Currencies where Code = ?"
+        );) {
             preparedStatement.setString(1, code);
             ResultSet rs = preparedStatement.executeQuery();
             if (rs.next()) {
@@ -46,10 +44,8 @@ public class CurrencyRepository extends BaseRepository {
                         rs.getString("code"),
                         rs.getString("fullName"),
                         rs.getString("sign"));
-                preparedStatement.close();
                 return Optional.of(currency);
             }
-            preparedStatement.close();
             return Optional.empty();
         } catch (SQLException e) {
             throw new UnknownException();
@@ -57,11 +53,10 @@ public class CurrencyRepository extends BaseRepository {
     }
 
     public int create(Currency currency) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO currencies (Code, FullName, Sign) VALUES (?, ?, ?)",
-                    Statement.RETURN_GENERATED_KEYS
-            );
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO currencies (Code, FullName, Sign) VALUES (?, ?, ?)",
+                Statement.RETURN_GENERATED_KEYS
+        );) {
             preparedStatement.setString(1, currency.code);
             preparedStatement.setString(2, currency.fullName);
             preparedStatement.setString(3, currency.sign);
@@ -69,7 +64,7 @@ public class CurrencyRepository extends BaseRepository {
             ResultSet rs = preparedStatement.getGeneratedKeys();
             rs.next();
             int id = rs.getInt(1);
-            preparedStatement.close();
+
             return id;
         } catch (SQLException e) {
             if (e.getMessage().contains("UNIQUE constraint failed")) {
