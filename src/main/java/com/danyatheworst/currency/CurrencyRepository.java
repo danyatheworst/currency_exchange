@@ -2,7 +2,9 @@ package main.java.com.danyatheworst.currency;
 
 import main.java.com.danyatheworst.BaseRepository;
 import main.java.com.danyatheworst.exceptions.CurrencyAlreadyExistsException;
-import main.java.com.danyatheworst.exceptions.UnknownException;
+import main.java.com.danyatheworst.exceptions.DatabaseOperationException;
+import org.sqlite.SQLiteErrorCode;
+import org.sqlite.SQLiteException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,22 +14,15 @@ import java.util.Optional;
 public class CurrencyRepository extends BaseRepository implements CrudRepository<Currency> {
     public List<Currency> findAll() {
         try (PreparedStatement preparedStatement = connection.prepareStatement("select * from Currencies");) {
-            ResultSet rs = preparedStatement.executeQuery();
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             List<Currency> currencies = new ArrayList<>();
-            while (rs.next()) {
-                Currency currency = new Currency(
-                        rs.getInt("id"),
-                        rs.getString("code"),
-                        rs.getString("fullName"),
-                        rs.getString("sign")
-                );
-                currencies.add(currency);
+            while (resultSet.next()) {
+                currencies.add(getCurrency(resultSet));
             }
             return currencies;
         } catch (SQLException e) {
-            throw new UnknownException();
-
+            throw new DatabaseOperationException("Failed to read all currencies from the database");
         }
     }
 
@@ -36,39 +31,49 @@ public class CurrencyRepository extends BaseRepository implements CrudRepository
                 "select * from Currencies where Code = ?"
         );) {
             preparedStatement.setString(1, code);
-            ResultSet rs = preparedStatement.executeQuery();
-            if (rs.next()) {
-                Currency currency = new Currency(
-                        rs.getInt("id"),
-                        rs.getString("code"),
-                        rs.getString("fullName"),
-                        rs.getString("sign"));
-                return Optional.of(currency);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return Optional.of(getCurrency(resultSet));
             }
             return Optional.empty();
         } catch (SQLException e) {
-            throw new UnknownException();
+            throw new DatabaseOperationException("Failed to read currency with code " + code + " from the database");
         }
     }
 
-    public int create(Currency currency) {
+    public Currency save(Currency currency) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO currencies (Code, FullName, Sign) VALUES (?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS
-        );) {
+                "INSERT INTO currencies (Code, FullName, Sign) VALUES (?, ?, ?) RETURNING *"
+        )) {
             preparedStatement.setString(1, currency.code);
             preparedStatement.setString(2, currency.fullName);
             preparedStatement.setString(3, currency.sign);
-            preparedStatement.executeUpdate();
-            ResultSet rs = preparedStatement.getGeneratedKeys();
-            rs.next();
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-            return rs.getInt(1);
-        } catch (SQLException e) {
-            if (e.getMessage().contains("UNIQUE constraint failed")) {
-                throw new CurrencyAlreadyExistsException();
+            if (!resultSet.next()) {
+                throw new DatabaseOperationException(
+                        "Failed to save currency with code " + currency.getCode() + " to the database"
+                );
             }
-            throw new UnknownException();
+
+            return getCurrency(resultSet);
+        } catch (SQLException e) {
+            if (e instanceof SQLiteException) {
+                if (((SQLiteException) e).getResultCode() == SQLiteErrorCode.SQLITE_CONSTRAINT_UNIQUE) {
+                    throw new CurrencyAlreadyExistsException("Currency with code " + currency.getCode() + " already" +
+                            " exists");
+                }
+            }
+            throw new DatabaseOperationException(
+                    "Failed to save currency with code " + currency.getCode() + " to the database"
+            );
         }
+    }
+
+    public static Currency getCurrency(ResultSet resultSet) throws SQLException {
+        return new Currency(resultSet.getInt("id"),
+                resultSet.getString("code"),
+                resultSet.getString("fullName"),
+                resultSet.getString("sign"));
     }
 }

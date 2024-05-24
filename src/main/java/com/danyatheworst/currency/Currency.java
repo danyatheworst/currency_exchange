@@ -6,6 +6,8 @@ public class Currency {
     public String fullName;
     public String sign;
 
+    public Currency() {}
+
     public Currency(Integer id, String code, String fullName, String sign) {
         this.id = id;
         this.code = code;
@@ -33,5 +35,21 @@ public class Currency {
 
     public String getFullName() {
         return fullName;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void setSign(String sign) {
+        this.sign = sign;
     }
 }

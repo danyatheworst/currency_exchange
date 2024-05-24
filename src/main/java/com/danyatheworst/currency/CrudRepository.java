@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface CrudRepository<T> {
     List<T> findAll();
-    int create(T currency);
+    Currency save(T currency);
 }

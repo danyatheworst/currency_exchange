@@ -3,7 +3,7 @@ package main.java.com.danyatheworst.exchange;
 import main.java.com.danyatheworst.BaseRepository;
 import main.java.com.danyatheworst.currency.CrudRepository;
 import main.java.com.danyatheworst.currency.Currency;
-import main.java.com.danyatheworst.exceptions.UnknownException;
+import main.java.com.danyatheworst.exceptions.DatabaseOperationException;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,13 +40,13 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
             }
             return exchangeRates;
         } catch (SQLException e) {
-            throw new UnknownException();
+            throw new DatabaseOperationException("Failed to read all currency exchanges from the database");
         }
 
     }
 
-    public int create(ExchangeRate currency) {
-        return 0;
+    public Currency save(ExchangeRate currency) {
+        return null;
     }
 
     private static ExchangeRate parseExchangeRate(ResultSet resultSet) throws SQLException {
