@@ -1,9 +1,7 @@
 package main.java.com.danyatheworst.exceptions;
 
-import java.sql.SQLException;
-
-public class CurrencyAlreadyExistsException extends RuntimeException {
-    public CurrencyAlreadyExistsException(String message) {
+public class EntityAlreadyExistsException extends RuntimeException {
+    public EntityAlreadyExistsException(String message) {
         super(message);
     }
 }

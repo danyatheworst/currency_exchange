@@ -1,7 +1,7 @@
 package main.java.com.danyatheworst.currency;
 
 import main.java.com.danyatheworst.BaseRepository;
-import main.java.com.danyatheworst.exceptions.CurrencyAlreadyExistsException;
+import main.java.com.danyatheworst.exceptions.EntityAlreadyExistsException;
 import main.java.com.danyatheworst.exceptions.DatabaseOperationException;
 import org.sqlite.SQLiteErrorCode;
 import org.sqlite.SQLiteException;
@@ -60,7 +60,7 @@ public class CurrencyRepository extends BaseRepository implements CrudRepository
         } catch (SQLException e) {
             if (e instanceof SQLiteException) {
                 if (((SQLiteException) e).getResultCode() == SQLiteErrorCode.SQLITE_CONSTRAINT_UNIQUE) {
-                    throw new CurrencyAlreadyExistsException("Currency with code " + currency.getCode() + " already" +
+                    throw new EntityAlreadyExistsException("Currency with code " + currency.getCode() + " already" +
                             " exists");
                 }
             }

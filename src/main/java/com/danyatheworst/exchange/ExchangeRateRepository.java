@@ -3,7 +3,10 @@ package main.java.com.danyatheworst.exchange;
 import main.java.com.danyatheworst.BaseRepository;
 import main.java.com.danyatheworst.currency.CrudRepository;
 import main.java.com.danyatheworst.currency.Currency;
+import main.java.com.danyatheworst.exceptions.EntityAlreadyExistsException;
 import main.java.com.danyatheworst.exceptions.DatabaseOperationException;
+import org.sqlite.SQLiteErrorCode;
+import org.sqlite.SQLiteException;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,7 +39,7 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
             List<ExchangeRate> exchangeRates = new ArrayList<>();
 
             while (resultSet.next()) {
-                exchangeRates.add(parseExchangeRate(resultSet));
+                exchangeRates.add(getExchangeRate(resultSet));
             }
             return exchangeRates;
         } catch (SQLException e) {
@@ -45,11 +48,29 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
 
     }
 
-    public Currency save(ExchangeRate currency) {
-        return null;
+    public ExchangeRate save(ExchangeRate exchangeRate) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO ExchangeRates (baseCurrencyId, targetCurrencyId, Rate) VALUES (?, ?, ?) RETURNING id"
+        )) {
+            preparedStatement.setInt(1, exchangeRate.baseCurrency.id);
+            preparedStatement.setInt(2, exchangeRate.targetCurrency.id);
+            preparedStatement.setBigDecimal(3, exchangeRate.rate);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            exchangeRate.setId(resultSet.getInt("ID"));
+            return exchangeRate;
+        } catch (SQLException e) {
+            if (e instanceof SQLiteException) {
+                if (((SQLiteException) e).getResultCode() == SQLiteErrorCode.SQLITE_CONSTRAINT_UNIQUE) {
+                    throw new EntityAlreadyExistsException("Exchange rate " + exchangeRate.baseCurrency.getCode() + " - "
+                            + exchangeRate.targetCurrency.getCode() + " already exists");
+                }
+            }
+            throw new DatabaseOperationException("Failed to save the currency exchange in the database");
+        }
     }
 
-    private static ExchangeRate parseExchangeRate(ResultSet resultSet) throws SQLException {
+    private static ExchangeRate getExchangeRate(ResultSet resultSet) throws SQLException {
         return new ExchangeRate(
                 resultSet.getInt("id"),
                 new Currency(

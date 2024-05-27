@@ -6,7 +6,7 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import main.java.com.danyatheworst.exceptions.CurrencyAlreadyExistsException;
+import main.java.com.danyatheworst.exceptions.EntityAlreadyExistsException;
 import main.java.com.danyatheworst.exceptions.DatabaseOperationException;
 import main.java.com.danyatheworst.exceptions.InvalidParameterException;
 import main.java.com.danyatheworst.exceptions.NotFoundException;
@@ -28,7 +28,7 @@ public class ExceptionHandlingFilter extends HttpFilter {
         } catch (NotFoundException e) {
             servletResponse.setStatus(SC_NOT_FOUND);
             this.gson.toJson(new ErrorResponseDto(e.getMessage()), servletResponse.getWriter());
-        } catch (CurrencyAlreadyExistsException e) {
+        } catch (EntityAlreadyExistsException e) {
             servletResponse.setStatus(SC_CONFLICT);
             this.gson.toJson(new ErrorResponseDto(e.getMessage()), servletResponse.getWriter());
         } catch (DatabaseOperationException e) {

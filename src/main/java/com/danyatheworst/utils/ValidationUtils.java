@@ -24,7 +24,6 @@ public class ValidationUtils {
                     .map(Currency::getCurrencyCode)
                     .collect(Collectors.toSet());
         }
-
         if (!currencyCodes.contains(code)) {
             throw new InvalidParameterException("Currency code must be in ISO 4217 format");
         }

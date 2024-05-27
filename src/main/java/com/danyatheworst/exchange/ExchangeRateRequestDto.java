@@ -5,10 +5,10 @@ public class ExchangeRateRequestDto {
     public String targetCurrencyCode;
     public String rate;
 
-    public ExchangeRateRequestDto(String rate, String targetCurrencyCode, String baseCurrencyCode) {
-        this.rate = rate;
-        this.targetCurrencyCode = targetCurrencyCode;
+    public ExchangeRateRequestDto(String baseCurrencyCode, String targetCurrencyCode, String rate) {
         this.baseCurrencyCode = baseCurrencyCode;
+        this.targetCurrencyCode = targetCurrencyCode;
+        this.rate = rate;
     }
 
     public String getBaseCurrencyCode() {

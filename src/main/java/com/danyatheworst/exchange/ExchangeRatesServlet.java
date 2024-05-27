@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @WebServlet(name = "ExchangeRatesServlet", urlPatterns = {"/exchangeRates"})
 public class ExchangeRatesServlet extends HttpServlet {
     private final ExchangeRateRepository exchangeRateRepository = new ExchangeRateRepository();
+    private final ExchangeRateService exchangeRateService = new ExchangeRateService();
     private final Gson gson = new Gson();
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -28,12 +29,17 @@ public class ExchangeRatesServlet extends HttpServlet {
         this.gson.toJson(exchangeRatesResponseDto, resp.getWriter());
     }
 
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         ExchangeRateRequestDto exchangeRateRequestDto = new ExchangeRateRequestDto(
                 req.getParameter("baseCurrencyCode"),
                 req.getParameter("targetCurrencyCode"),
                 req.getParameter("rate")
         );
         ValidationUtils.validate(exchangeRateRequestDto);
+
+        ExchangeRateResponseDto exchangeRateResponseDto =
+                MappingUtils.convertToDto(this.exchangeRateService.save(exchangeRateRequestDto));
+        resp.setStatus(HttpServletResponse.SC_OK);
+        this.gson.toJson(exchangeRateResponseDto, resp.getWriter());
     }
 }
