@@ -5,6 +5,7 @@ import main.java.com.danyatheworst.currency.CrudRepository;
 import main.java.com.danyatheworst.currency.Currency;
 import main.java.com.danyatheworst.exceptions.EntityAlreadyExistsException;
 import main.java.com.danyatheworst.exceptions.DatabaseOperationException;
+import main.java.com.danyatheworst.exceptions.NotFoundException;
 import org.sqlite.SQLiteErrorCode;
 import org.sqlite.SQLiteException;
 
@@ -70,7 +71,7 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) {
-                throw new DatabaseOperationException("Such exchange rate is not present in the database");
+                throw new NotFoundException("Such exchange rate is not present in the database");
             }
             return getExchangeRate(resultSet);
         } catch (SQLException e) {
