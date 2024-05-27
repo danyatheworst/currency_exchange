@@ -18,7 +18,7 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String code = req.getPathInfo().replaceAll("/", "");
+        String code = req.getPathInfo().replaceFirst("/", "");
         ValidationUtils.validateCurrencyCode(code);
 
         Currency currency = this.currencyRepository.findByCode(code)

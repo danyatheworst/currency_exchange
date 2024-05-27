@@ -2,7 +2,7 @@ package main.java.com.danyatheworst.utils;
 
 import main.java.com.danyatheworst.currency.CurrencyRequestDto;
 import main.java.com.danyatheworst.exceptions.InvalidParameterException;
-import main.java.com.danyatheworst.exchange.ExchangeRateRequestDto;
+import main.java.com.danyatheworst.exchange.ExchangeRatesRequestDto;
 
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -41,17 +41,17 @@ public class ValidationUtils {
         validatePresence(currencyRequestDto.sign);
     }
 
+    public static void validate(ExchangeRatesRequestDto exchangeRateRequestDto) {
+        validateCurrencyCode(exchangeRateRequestDto.baseCurrencyCode);
+        validateCurrencyCode(exchangeRateRequestDto.targetCurrencyCode);
+        validateRate(exchangeRateRequestDto.rate);
+    }
+
     public static void validateRate(String rate) {
         try {
             new BigDecimal(rate);
         } catch (NumberFormatException e) {
             throw new InvalidParameterException("Currency rate must be represented as an integer");
         }
-    }
-
-    public static void validate(ExchangeRateRequestDto currencyRequestDto) {
-        validateCurrencyCode(currencyRequestDto.baseCurrencyCode);
-        validateCurrencyCode(currencyRequestDto.targetCurrencyCode);
-        validateRate(currencyRequestDto.rate);
     }
 }

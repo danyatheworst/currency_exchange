@@ -1,11 +1,11 @@
 package main.java.com.danyatheworst.exchange;
 
-public class ExchangeRateRequestDto {
+public class ExchangeRatesRequestDto {
     public String baseCurrencyCode;
     public String targetCurrencyCode;
     public String rate;
 
-    public ExchangeRateRequestDto(String baseCurrencyCode, String targetCurrencyCode, String rate) {
+    public ExchangeRatesRequestDto(String baseCurrencyCode, String targetCurrencyCode, String rate) {
         this.baseCurrencyCode = baseCurrencyCode;
         this.targetCurrencyCode = targetCurrencyCode;
         this.rate = rate;

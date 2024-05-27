@@ -1,7 +1,6 @@
 package main.java.com.danyatheworst.exchange;
 
 import com.google.gson.Gson;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +10,6 @@ import main.java.com.danyatheworst.utils.ValidationUtils;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @WebServlet(name = "ExchangeRatesServlet", urlPatterns = {"/exchangeRates"})
 public class ExchangeRatesServlet extends HttpServlet {
@@ -30,7 +28,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        ExchangeRateRequestDto exchangeRateRequestDto = new ExchangeRateRequestDto(
+        ExchangeRatesRequestDto exchangeRateRequestDto = new ExchangeRatesRequestDto(
                 req.getParameter("baseCurrencyCode"),
                 req.getParameter("targetCurrencyCode"),
                 req.getParameter("rate")
@@ -39,7 +37,7 @@ public class ExchangeRatesServlet extends HttpServlet {
 
         ExchangeRateResponseDto exchangeRateResponseDto =
                 MappingUtils.convertToDto(this.exchangeRateService.save(exchangeRateRequestDto));
-        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.setStatus(HttpServletResponse.SC_CREATED);
         this.gson.toJson(exchangeRateResponseDto, resp.getWriter());
     }
 }

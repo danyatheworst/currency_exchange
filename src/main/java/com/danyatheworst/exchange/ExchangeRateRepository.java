@@ -16,25 +16,24 @@ import java.util.List;
 
 public class ExchangeRateRepository extends BaseRepository implements CrudRepository<ExchangeRate> {
     public List<ExchangeRate> findAll() {
-        try {
-            String sql =
-                    """
-                            SELECT
-                                er.ID as id,
-                                bc.ID as baseId,
-                                bc.Code as baseCode,
-                                bc.FullName as baseName,
-                                bc.Sign as baseSign,
-                                tc.ID as targetId,
-                                tc.Code as targetCode,
-                                tc.FullName as targetName,
-                                tc.Sign as targetSign,
-                                er.Rate as rate
-                            from ExchangeRates er
-                            INNER JOIN main.Currencies bc on er.BaseCurrencyId=bc.ID
-                            INNER JOIN main.Currencies tc on er.TargetCurrencyId=tc.ID;
-                            """;
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        String sql =
+                """
+                        SELECT
+                            er.ID as id,
+                            bc.ID as baseId,
+                            bc.Code as baseCode,
+                            bc.FullName as baseName,
+                            bc.Sign as baseSign,
+                            tc.ID as targetId,
+                            tc.Code as targetCode,
+                            tc.FullName as targetName,
+                            tc.Sign as targetSign,
+                            er.Rate as rate
+                        from ExchangeRates er
+                        INNER JOIN main.Currencies bc on er.BaseCurrencyId=bc.ID
+                        INNER JOIN main.Currencies tc on er.TargetCurrencyId=tc.ID;
+                        """;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<ExchangeRate> exchangeRates = new ArrayList<>();
 
@@ -45,13 +44,43 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
         } catch (SQLException e) {
             throw new DatabaseOperationException("Failed to read all currency exchanges from the database");
         }
+    }
 
+    public ExchangeRate findByCodes(String baseCurrencyCode, String targetCurrencyCode) {
+        String sql = """
+                        SELECT
+                            er.ID as id,
+                            bc.ID as baseId,
+                            bc.Code as baseCode,
+                            bc.FullName as baseName,
+                            bc.Sign as baseSign,
+                            tc.ID as targetId,
+                            tc.Code as targetCode,
+                            tc.FullName as targetName,
+                            tc.Sign as targetSign,
+                            er.Rate as rate
+                        from ExchangeRates er
+                        INNER JOIN main.Currencies bc on er.BaseCurrencyId=bc.ID
+                        INNER JOIN main.Currencies tc on er.TargetCurrencyId=tc.ID
+                        WHERE bc.Code = ? AND tc.Code = ?;
+                        """;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, baseCurrencyCode);
+            preparedStatement.setString(2, targetCurrencyCode);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (!resultSet.next()) {
+                throw new DatabaseOperationException("Such exchange rate is not present in the database");
+            }
+            return getExchangeRate(resultSet);
+        } catch (SQLException e) {
+            throw new DatabaseOperationException("Failed to get the currency exchange from the database");
+        }
     }
 
     public ExchangeRate save(ExchangeRate exchangeRate) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO ExchangeRates (baseCurrencyId, targetCurrencyId, Rate) VALUES (?, ?, ?) RETURNING id"
-        )) {
+        String sql = "INSERT INTO ExchangeRates (baseCurrencyId, targetCurrencyId, Rate) VALUES (?, ?, ?) RETURNING id";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, exchangeRate.baseCurrency.id);
             preparedStatement.setInt(2, exchangeRate.targetCurrency.id);
             preparedStatement.setBigDecimal(3, exchangeRate.rate);
