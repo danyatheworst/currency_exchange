@@ -28,4 +28,24 @@ public class ExchangeRateService {
 
         return exchangeRateRepository.save(new ExchangeRate(baseCurrency, targetCurrency, rate));
     }
+
+    public ExchangeRate update(ExchangeRatesRequestDto exchangeRateRequestDto) {
+        //Duplicated code fragment — don't rush with refactoring
+        String baseCurrencyCode = exchangeRateRequestDto.baseCurrencyCode;
+        String targetCurrencyCode = exchangeRateRequestDto.targetCurrencyCode;
+        Currency baseCurrency = currencyRepository
+                .findByCode(baseCurrencyCode)
+                .orElseThrow(() -> new NotFoundException(
+                        "Currency with code " + baseCurrencyCode + " is not present in the database")
+                );
+        Currency targetCurrency = currencyRepository
+                .findByCode(targetCurrencyCode)
+                .orElseThrow(() -> new NotFoundException(
+                        "Currency with code " + targetCurrencyCode + " is not present in the database")
+                );
+
+        BigDecimal rate = new BigDecimal(exchangeRateRequestDto.rate);
+
+        return exchangeRateRepository.update(new ExchangeRate(baseCurrency, targetCurrency, rate));
+    }
 }

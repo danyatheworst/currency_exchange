@@ -48,6 +48,7 @@ public class ValidationUtils {
     }
 
     public static void validateRate(String rate) {
+        validatePresence(rate);
         try {
             new BigDecimal(rate);
         } catch (NumberFormatException e) {
