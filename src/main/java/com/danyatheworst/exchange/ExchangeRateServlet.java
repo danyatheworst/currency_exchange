@@ -11,9 +11,8 @@ import main.java.com.danyatheworst.utils.MappingUtils;
 import main.java.com.danyatheworst.utils.ValidationUtils;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet(name = "ExchangeRateServlet", urlPatterns = {"/exchangeRate/*"})
 public class ExchangeRateServlet extends HttpServlet {
@@ -46,9 +45,14 @@ public class ExchangeRateServlet extends HttpServlet {
         String currencyCodes = getCurrencyCodes(req);
         String baseCurrencyCode = currencyCodes.substring(0, 3);
         String targetCurrencyCode = currencyCodes.substring(3);
-        String rate = getRate(req.getReader().readLine());
+        String formString = req.getReader().readLine();
+        if (formString == null || !formString.contains("rate")) {
+            throw new InvalidParameterException("Missing parameter — rate");
+        }
+        Map<String, String> form = parseFormStringToMap(formString);
+
         ExchangeRatesRequestDto exchangeRateRequestDto = new ExchangeRatesRequestDto(
-                baseCurrencyCode, targetCurrencyCode, rate
+                baseCurrencyCode, targetCurrencyCode, form.get("rate")
         );
         ValidationUtils.validate(exchangeRateRequestDto);
 
@@ -65,25 +69,15 @@ public class ExchangeRateServlet extends HttpServlet {
         return currencyCodes;
     }
 
-    private static String getRate(String formString) {
-        if (formString == null || !formString.contains("rate")) {
-            throw new InvalidParameterException("Missing parameter — rate");
+    private static Map<String, String> parseFormStringToMap(String formString) {
+        Map<String, String> map = new HashMap<>();
+        String[] pairs = formString.split("&");
+        for (String pair : pairs) {
+            String[] keyValue = pair.split("=");
+            String key = keyValue[0];
+            String value = keyValue.length > 1 ? keyValue[1] : "";
+            map.put(key, value);
         }
-
-        Optional<String> rate = Optional.empty();
-
-        for (String string : formString.split("&")) {
-            String[] parts = string.split("=");
-            if (parts[0].equals("rate") && parts.length == 2) {
-                rate = Optional.of(parts[1]);
-                break;
-            }
-        }
-
-        if (rate.isEmpty()) {
-            throw new InvalidParameterException("Missing parameter — rate");
-        }
-
-        return rate.get();
+        return map;
     }
 }
