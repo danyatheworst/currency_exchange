@@ -29,16 +29,16 @@ public class ValidationUtils {
         }
     }
 
-    private static void validatePresence(String parameter) {
-        if (parameter.isBlank()) {
-            throw new InvalidParameterException(parameter + " parameter missing");
+    private static void validatePresence(String parameter, String parameterName) {
+        if (parameter == null || parameter.isBlank()) {
+            throw new InvalidParameterException(parameterName + " parameter missing");
         }
     }
 
     public static void validate(CurrencyRequestDto currencyRequestDto) {
         validateCurrencyCode(currencyRequestDto.code);
-        validatePresence(currencyRequestDto.name);
-        validatePresence(currencyRequestDto.sign);
+        validatePresence(currencyRequestDto.name, "name");
+        validatePresence(currencyRequestDto.sign, "sign");
     }
 
     public static void validate(ExchangeRatesRequestDto exchangeRateRequestDto) {
@@ -48,7 +48,7 @@ public class ValidationUtils {
     }
 
     public static void validateRate(String rate) {
-        validatePresence(rate);
+        validatePresence(rate, "rate");
         try {
             new BigDecimal(rate);
         } catch (NumberFormatException e) {

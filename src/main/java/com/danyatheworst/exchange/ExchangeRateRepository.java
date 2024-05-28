@@ -101,11 +101,13 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
     }
 
     public ExchangeRate update(ExchangeRate exchangeRate) {
-        String sql = "UPDATE ExchangeRates SET rate = ? WHERE ID = ?";
+        String sql = "UPDATE ExchangeRates SET rate = ? WHERE BaseCurrencyId = ? AND TargetCurrencyId = ? RETURNING ID";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setBigDecimal(1, exchangeRate.rate);
-            preparedStatement.setInt(2, exchangeRate.id);
-            preparedStatement.executeUpdate();
+            preparedStatement.setInt(2, exchangeRate.baseCurrency.id);
+            preparedStatement.setInt(3, exchangeRate.targetCurrency.id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            exchangeRate.setId(resultSet.getInt("ID"));
             exchangeRate.setRate(exchangeRate.rate);
             return exchangeRate;
         } catch (SQLException e) {
