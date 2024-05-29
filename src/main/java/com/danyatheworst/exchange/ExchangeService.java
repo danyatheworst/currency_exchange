@@ -15,6 +15,20 @@ public class ExchangeService {
     private final ExchangeRateRepository exchangeRateRepository = new ExchangeRateRepository();
 
     public ExchangeDto exchange(ExchangeRequestDto exchangeRequestDto) {
+        ExchangeRate exchangeRate = this.findExchangeRate(exchangeRequestDto)
+                .orElseThrow(() -> new NotFoundException("Exchange rate " + exchangeRequestDto.baseCurrencyCode + " - "
+                        + exchangeRequestDto.targetCurrencyCode + " is not found the database"));
+
+        BigDecimal rate = exchangeRate.rate;
+        BigDecimal convertedAmount = exchangeRequestDto.amount
+                .multiply(rate, DECIMAL64)
+                .setScale(2, RoundingMode.HALF_EVEN);
+        return new ExchangeDto(
+                exchangeRate.baseCurrency, exchangeRate.targetCurrency, rate, exchangeRequestDto.amount, convertedAmount
+        );
+    }
+
+    private Optional<ExchangeRate> findExchangeRate(ExchangeRequestDto exchangeRequestDto) {
         String baseCurrencyCode = exchangeRequestDto.baseCurrencyCode;
         String targetCurrencyCode = exchangeRequestDto.targetCurrencyCode;
         Currency baseCurrency = this.currencyRepository
@@ -28,27 +42,36 @@ public class ExchangeService {
                         "Currency with code " + targetCurrencyCode + " is not present in the database")
                 );
 
-        BigDecimal amount = exchangeRequestDto.amount;
+        Optional<BigDecimal> rate = this.getDirectRate(baseCurrencyCode, targetCurrencyCode);
 
-        //B-T is present
-        Optional<ExchangeRate> baseTargetExchangeRate =
-                this.exchangeRateRepository.findByCodes(baseCurrencyCode, targetCurrencyCode);
-        if (baseTargetExchangeRate.isPresent()) {
-            BigDecimal rate = baseTargetExchangeRate.get().rate;
-            return new ExchangeDto(baseCurrency, targetCurrency, rate, amount, convertСurrency(amount, rate));
+        if (rate.isEmpty()) {
+            rate = this.getIndirectRate(targetCurrencyCode, baseCurrencyCode);
         }
 
-        //T-B is present
-        Optional<ExchangeRate> targetBaseExchangeRate =
-                this.exchangeRateRepository.findByCodes(targetCurrencyCode, baseCurrencyCode);
-        if (targetBaseExchangeRate.isPresent()) {
-            BigDecimal reversedRate = targetBaseExchangeRate.get().rate;
-            BigDecimal rate = BigDecimal.ONE.divide(reversedRate, DECIMAL64)
-                    .setScale(6, RoundingMode.HALF_EVEN);
-            return new ExchangeDto(baseCurrency, targetCurrency, rate, amount, convertСurrency(amount, rate));
+        if (rate.isEmpty()) {
+            rate = this.getCrossRate(baseCurrencyCode, targetCurrencyCode);
         }
 
-        //USD-A and USD-B are present
+        return rate.map(bigDecimal -> new ExchangeRate(baseCurrency, targetCurrency, bigDecimal));
+    };
+
+    private Optional<BigDecimal> getDirectRate(String baseCurrencyCode, String targetCurrencyCode) {
+        return this.exchangeRateRepository
+                .findByCodes(baseCurrencyCode, targetCurrencyCode)
+                .map(exchangeRate -> exchangeRate.rate);
+    }
+
+    private Optional<BigDecimal> getIndirectRate(String targetCurrencyCode, String baseCurrencyCode)  {
+        Optional<ExchangeRate> exchangeRate = exchangeRateRepository
+                .findByCodes(targetCurrencyCode, baseCurrencyCode);
+        if (exchangeRate.isPresent()) {
+            BigDecimal rate = exchangeRate.get().rate;
+            return Optional.of(BigDecimal.ONE.divide(rate, DECIMAL64).setScale(6, RoundingMode.HALF_EVEN));
+        }
+        return Optional.empty();
+    }
+
+    private Optional<BigDecimal> getCrossRate(String baseCurrencyCode, String targetCurrencyCode) {
         Optional<ExchangeRate> crossBaseExchangeRate =
                 this.exchangeRateRepository.findByCodes("USD", baseCurrencyCode);
         Optional<ExchangeRate> crossTargetExchangeRate =
@@ -59,13 +82,8 @@ public class ExchangeService {
                     .rate
                     .divide(crossBaseExchangeRate.get().rate, DECIMAL64)
                     .setScale(6, RoundingMode.HALF_EVEN);
-            return new ExchangeDto(baseCurrency, targetCurrency, rate, amount, convertСurrency(amount, rate));
+            return Optional.of(rate);
         }
-
-        throw new NotFoundException("asd");
-    }
-
-    private BigDecimal convertСurrency(BigDecimal amount, BigDecimal rate) {
-        return rate.multiply(amount).setScale(2, RoundingMode.HALF_EVEN);
+        return Optional.empty();
     }
 }
