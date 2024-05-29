@@ -1,11 +1,11 @@
-package main.java.com.danyatheworst;
+package main.java.com.danyatheworst.filters;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 
 import java.io.IOException;
 
-@WebFilter(urlPatterns = "/*")
+@WebFilter(value = {"/currencies", "/currency/*", "/exchangeRate/*", "/exchangeRates", "/exchange"})
 public class HeaderSetterFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

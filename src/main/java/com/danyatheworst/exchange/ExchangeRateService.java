@@ -15,8 +15,8 @@ public class ExchangeRateService {
     private final ExchangeRateRepository exchangeRateRepository = new ExchangeRateRepository();
 
     public ExchangeRate save(ExchangeRatesRequestDto exchangeRateRequestDto) {
-        String baseCurrencyCode = exchangeRateRequestDto.baseCurrencyCode;
-        String targetCurrencyCode = exchangeRateRequestDto.targetCurrencyCode;
+        String baseCurrencyCode = exchangeRateRequestDto.getBaseCurrencyCode();
+        String targetCurrencyCode = exchangeRateRequestDto.getTargetCurrencyCode();
         Currency baseCurrency = this.currencyRepository
                 .findByCode(baseCurrencyCode)
                 .orElseThrow(() -> new NotFoundException(
@@ -29,13 +29,15 @@ public class ExchangeRateService {
                 );
 
 
-        return exchangeRateRepository.save(new ExchangeRate(baseCurrency, targetCurrency, exchangeRateRequestDto.rate));
+        return exchangeRateRepository.save(
+                new ExchangeRate(baseCurrency, targetCurrency, exchangeRateRequestDto.getRate())
+        );
     }
 
     public ExchangeRate update(ExchangeRatesRequestDto exchangeRateRequestDto) {
         //Duplicated code fragment — don't rush with refactoring
-        String baseCurrencyCode = exchangeRateRequestDto.baseCurrencyCode;
-        String targetCurrencyCode = exchangeRateRequestDto.targetCurrencyCode;
+        String baseCurrencyCode = exchangeRateRequestDto.getBaseCurrencyCode();
+        String targetCurrencyCode = exchangeRateRequestDto.getTargetCurrencyCode();
         Currency baseCurrency = this.currencyRepository
                 .findByCode(baseCurrencyCode)
                 .orElseThrow(() -> new NotFoundException(
@@ -47,6 +49,8 @@ public class ExchangeRateService {
                         "Currency with code " + targetCurrencyCode + " is not present in the database")
                 );
 
-        return exchangeRateRepository.update(new ExchangeRate(baseCurrency, targetCurrency, exchangeRateRequestDto.rate));
+        return exchangeRateRepository.update(
+                new ExchangeRate(baseCurrency, targetCurrency, exchangeRateRequestDto.getRate())
+        );
     }
 }

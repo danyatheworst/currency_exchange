@@ -16,21 +16,24 @@ public class ExchangeService {
 
     public ExchangeDto exchange(ExchangeRequestDto exchangeRequestDto) {
         ExchangeRate exchangeRate = this.findExchangeRate(exchangeRequestDto)
-                .orElseThrow(() -> new NotFoundException("Exchange rate " + exchangeRequestDto.baseCurrencyCode + " - "
-                        + exchangeRequestDto.targetCurrencyCode + " is not found the database"));
+                .orElseThrow(() -> new NotFoundException("Exchange rate " + exchangeRequestDto.getBaseCurrencyCode() + " - "
+                        + exchangeRequestDto.getTargetCurrencyCode() + " is not found the database"));
 
-        BigDecimal rate = exchangeRate.rate;
-        BigDecimal convertedAmount = exchangeRequestDto.amount
+        BigDecimal rate = exchangeRate.getRate();
+        BigDecimal convertedAmount = exchangeRequestDto.getAmount()
                 .multiply(rate, DECIMAL64)
                 .setScale(2, RoundingMode.HALF_EVEN);
         return new ExchangeDto(
-                exchangeRate.baseCurrency, exchangeRate.targetCurrency, rate, exchangeRequestDto.amount, convertedAmount
-        );
+                exchangeRate.getBaseCurrency(),
+                exchangeRate.getTargetCurrency(),
+                rate,
+                exchangeRequestDto.getAmount(),
+                convertedAmount);
     }
 
     private Optional<ExchangeRate> findExchangeRate(ExchangeRequestDto exchangeRequestDto) {
-        String baseCurrencyCode = exchangeRequestDto.baseCurrencyCode;
-        String targetCurrencyCode = exchangeRequestDto.targetCurrencyCode;
+        String baseCurrencyCode = exchangeRequestDto.getBaseCurrencyCode();
+        String targetCurrencyCode = exchangeRequestDto.getTargetCurrencyCode();
         Currency baseCurrency = this.currencyRepository
                 .findByCode(baseCurrencyCode)
                 .orElseThrow(() -> new NotFoundException(
@@ -58,14 +61,14 @@ public class ExchangeService {
     private Optional<BigDecimal> getDirectRate(String baseCurrencyCode, String targetCurrencyCode) {
         return this.exchangeRateRepository
                 .findByCodes(baseCurrencyCode, targetCurrencyCode)
-                .map(exchangeRate -> exchangeRate.rate);
+                .map(ExchangeRate::getRate);
     }
 
     private Optional<BigDecimal> getIndirectRate(String targetCurrencyCode, String baseCurrencyCode)  {
         Optional<ExchangeRate> exchangeRate = exchangeRateRepository
                 .findByCodes(targetCurrencyCode, baseCurrencyCode);
         if (exchangeRate.isPresent()) {
-            BigDecimal rate = exchangeRate.get().rate;
+            BigDecimal rate = exchangeRate.get().getRate();
             return Optional.of(BigDecimal.ONE.divide(rate, DECIMAL64).setScale(6, RoundingMode.HALF_EVEN));
         }
         return Optional.empty();
@@ -79,8 +82,8 @@ public class ExchangeService {
 
         if (crossBaseExchangeRate.isPresent() && crossTargetExchangeRate.isPresent()) {
             BigDecimal rate = crossTargetExchangeRate.get()
-                    .rate
-                    .divide(crossBaseExchangeRate.get().rate, DECIMAL64)
+                    .getRate()
+                    .divide(crossBaseExchangeRate.get().getRate(), DECIMAL64)
                     .setScale(6, RoundingMode.HALF_EVEN);
             return Optional.of(rate);
         }

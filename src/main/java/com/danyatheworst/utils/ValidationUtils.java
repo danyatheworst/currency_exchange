@@ -37,20 +37,20 @@ public class ValidationUtils {
     }
 
     public static void validate(CurrencyRequestDto currencyRequestDto) {
-        validateCurrencyCode(currencyRequestDto.code);
-        validatePresence(currencyRequestDto.name, "name");
-        validatePresence(currencyRequestDto.sign, "sign");
+        validateCurrencyCode(currencyRequestDto.getCode());
+        validatePresence(currencyRequestDto.getName(), "name");
+        validatePresence(currencyRequestDto.getSign(), "sign");
     }
 
     public static void validate(ExchangeRatesRequestDto exchangeRateRequestDto) {
-        validateCurrencyCode(exchangeRateRequestDto.baseCurrencyCode);
-        validateCurrencyCode(exchangeRateRequestDto.targetCurrencyCode);
+        validateCurrencyCode(exchangeRateRequestDto.getBaseCurrencyCode());
+        validateCurrencyCode(exchangeRateRequestDto.getTargetCurrencyCode());
     }
 
     public static void validate(ExchangeRequestDto exchangeRequestDto) {
-        validateCurrencyCode(exchangeRequestDto.baseCurrencyCode);
-        validateCurrencyCode(exchangeRequestDto.targetCurrencyCode);
-        if (exchangeRequestDto.amount.compareTo(BigDecimal.ZERO) <= 0) {
+        validateCurrencyCode(exchangeRequestDto.getBaseCurrencyCode());
+        validateCurrencyCode(exchangeRequestDto.getTargetCurrencyCode());
+        if (exchangeRequestDto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidParameterException("Amount to exchange must be represented as a positive number");
         }
     }

@@ -1,15 +1,16 @@
 package main.java.com.danyatheworst.exchange;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 
+@Getter
+@Setter
+@AllArgsConstructor
 public class ExchangeRequestDto {
-    public String baseCurrencyCode;
-    public String targetCurrencyCode;
-    public BigDecimal amount;
-
-    public ExchangeRequestDto(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
-        this.baseCurrencyCode = baseCurrencyCode;
-        this.targetCurrencyCode = targetCurrencyCode;
-        this.amount = amount;
-    }
+    private String baseCurrencyCode;
+    private String targetCurrencyCode;
+    private BigDecimal amount;
 }

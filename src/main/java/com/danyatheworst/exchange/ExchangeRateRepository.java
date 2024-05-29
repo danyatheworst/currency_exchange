@@ -83,9 +83,9 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
     public ExchangeRate save(ExchangeRate exchangeRate) {
         String sql = "INSERT INTO ExchangeRates (baseCurrencyId, targetCurrencyId, Rate) VALUES (?, ?, ?) RETURNING id";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, exchangeRate.baseCurrency.id);
-            preparedStatement.setInt(2, exchangeRate.targetCurrency.id);
-            preparedStatement.setBigDecimal(3, exchangeRate.rate);
+            preparedStatement.setInt(1, exchangeRate.getBaseCurrency().getId());
+            preparedStatement.setInt(2, exchangeRate.getTargetCurrency().getId());
+            preparedStatement.setBigDecimal(3, exchangeRate.getRate());
             ResultSet resultSet = preparedStatement.executeQuery();
 
             exchangeRate.setId(resultSet.getInt("ID"));
@@ -93,8 +93,8 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
         } catch (SQLException e) {
             if (e instanceof SQLiteException) {
                 if (((SQLiteException) e).getResultCode() == SQLiteErrorCode.SQLITE_CONSTRAINT_UNIQUE) {
-                    throw new EntityAlreadyExistsException("Exchange rate " + exchangeRate.baseCurrency.getCode() + " - "
-                            + exchangeRate.targetCurrency.getCode() + " already exists");
+                    throw new EntityAlreadyExistsException("Exchange rate " + exchangeRate.getBaseCurrency().getCode() + " - "
+                            + exchangeRate.getTargetCurrency().getCode() + " already exists");
                 }
             }
             throw new DatabaseOperationException("Failed to save the currency exchange in the database");
@@ -102,18 +102,20 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
     }
 
     public ExchangeRate update(ExchangeRate exchangeRate) {
+        Currency baseCurrency = exchangeRate.getBaseCurrency();
+        Currency targetCurrency = exchangeRate.getTargetCurrency();
         String sql = "UPDATE ExchangeRates SET rate = ? WHERE BaseCurrencyId = ? AND TargetCurrencyId = ? RETURNING ID";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setBigDecimal(1, exchangeRate.rate);
-            preparedStatement.setInt(2, exchangeRate.baseCurrency.id);
-            preparedStatement.setInt(3, exchangeRate.targetCurrency.id);
+            preparedStatement.setBigDecimal(1, exchangeRate.getRate());
+            preparedStatement.setInt(2, baseCurrency.getId());
+            preparedStatement.setInt(3, targetCurrency.getId());
             ResultSet resultSet = preparedStatement.executeQuery();
             exchangeRate.setId(resultSet.getInt("ID"));
-            exchangeRate.setRate(exchangeRate.rate);
+            exchangeRate.setRate(exchangeRate.getRate());
             return exchangeRate;
         } catch (SQLException e) {
             throw new DatabaseOperationException("Failed to update the currency exchange + "
-                    + exchangeRate.baseCurrency + " - " + exchangeRate.targetCurrency + " in the database");
+                    + baseCurrency.getCode() + " - " + targetCurrency.getCode() + " in the database");
         }
     }
 

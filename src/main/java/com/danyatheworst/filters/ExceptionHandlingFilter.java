@@ -1,4 +1,4 @@
-package main.java.com.danyatheworst;
+package main.java.com.danyatheworst.filters;
 
 import com.google.gson.Gson;
 import jakarta.servlet.*;
@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import main.java.com.danyatheworst.ErrorResponseDto;
 import main.java.com.danyatheworst.exceptions.EntityAlreadyExistsException;
 import main.java.com.danyatheworst.exceptions.DatabaseOperationException;
 import main.java.com.danyatheworst.exceptions.InvalidParameterException;

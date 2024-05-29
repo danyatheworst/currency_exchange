@@ -45,9 +45,9 @@ public class CurrencyRepository extends BaseRepository implements CrudRepository
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO currencies (Code, FullName, Sign) VALUES (?, ?, ?) RETURNING *"
         )) {
-            preparedStatement.setString(1, currency.code);
-            preparedStatement.setString(2, currency.fullName);
-            preparedStatement.setString(3, currency.sign);
+            preparedStatement.setString(1, currency.getCode());
+            preparedStatement.setString(2, currency.getFullName());
+            preparedStatement.setString(3, currency.getSign());
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) {
