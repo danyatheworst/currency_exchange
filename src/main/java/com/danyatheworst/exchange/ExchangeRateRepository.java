@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ExchangeRateRepository extends BaseRepository implements CrudRepository<ExchangeRate> {
     public List<ExchangeRate> findAll() {
@@ -47,7 +48,7 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
         }
     }
 
-    public ExchangeRate findByCodes(String baseCurrencyCode, String targetCurrencyCode) {
+    public Optional<ExchangeRate> findByCodes(String baseCurrencyCode, String targetCurrencyCode) {
         String sql = """
                         SELECT
                             er.ID as id,
@@ -70,10 +71,10 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
             preparedStatement.setString(2, targetCurrencyCode);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (!resultSet.next()) {
-                throw new NotFoundException("Such exchange rate is not present in the database");
+            if (resultSet.next()) {
+                return Optional.of(getExchangeRate(resultSet));
             }
-            return getExchangeRate(resultSet);
+            return Optional.empty();
         } catch (SQLException e) {
             throw new DatabaseOperationException("Failed to get the currency exchange from the database");
         }
@@ -111,7 +112,8 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
             exchangeRate.setRate(exchangeRate.rate);
             return exchangeRate;
         } catch (SQLException e) {
-            throw new DatabaseOperationException("Failed to update the currency exchange in the database");
+            throw new DatabaseOperationException("Failed to update the currency exchange + "
+                    + exchangeRate.baseCurrency + " - " + exchangeRate.targetCurrency + " in the database");
         }
     }
 

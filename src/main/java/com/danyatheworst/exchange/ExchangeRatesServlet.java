@@ -5,6 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import main.java.com.danyatheworst.utils.ConvertingUtils;
 import main.java.com.danyatheworst.utils.MappingUtils;
 import main.java.com.danyatheworst.utils.ValidationUtils;
 
@@ -31,7 +32,7 @@ public class ExchangeRatesServlet extends HttpServlet {
         ExchangeRatesRequestDto exchangeRateRequestDto = new ExchangeRatesRequestDto(
                 req.getParameter("baseCurrencyCode"),
                 req.getParameter("targetCurrencyCode"),
-                req.getParameter("rate")
+                ConvertingUtils.convert(req.getParameter("rate"), "Rate must be a number")
         );
         ValidationUtils.validate(exchangeRateRequestDto);
 

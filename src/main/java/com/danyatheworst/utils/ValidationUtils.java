@@ -3,6 +3,7 @@ package main.java.com.danyatheworst.utils;
 import main.java.com.danyatheworst.currency.CurrencyRequestDto;
 import main.java.com.danyatheworst.exceptions.InvalidParameterException;
 import main.java.com.danyatheworst.exchange.ExchangeRatesRequestDto;
+import main.java.com.danyatheworst.exchange.ExchangeRequestDto;
 
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -44,15 +45,13 @@ public class ValidationUtils {
     public static void validate(ExchangeRatesRequestDto exchangeRateRequestDto) {
         validateCurrencyCode(exchangeRateRequestDto.baseCurrencyCode);
         validateCurrencyCode(exchangeRateRequestDto.targetCurrencyCode);
-        validateRate(exchangeRateRequestDto.rate);
     }
 
-    public static void validateRate(String rate) {
-        validatePresence(rate, "rate");
-        try {
-            new BigDecimal(rate);
-        } catch (NumberFormatException e) {
-            throw new InvalidParameterException("Currency rate must be represented as an integer");
+    public static void validate(ExchangeRequestDto exchangeRequestDto) {
+        validateCurrencyCode(exchangeRequestDto.baseCurrencyCode);
+        validateCurrencyCode(exchangeRequestDto.targetCurrencyCode);
+        if (exchangeRequestDto.amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidParameterException("Amount to exchange must be represented as a positive number");
         }
     }
 }

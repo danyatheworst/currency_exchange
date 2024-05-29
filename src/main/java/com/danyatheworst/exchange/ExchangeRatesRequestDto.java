@@ -1,11 +1,13 @@
 package main.java.com.danyatheworst.exchange;
 
+import java.math.BigDecimal;
+
 public class ExchangeRatesRequestDto {
     public String baseCurrencyCode;
     public String targetCurrencyCode;
-    public String rate;
+    public BigDecimal rate;
 
-    public ExchangeRatesRequestDto(String baseCurrencyCode, String targetCurrencyCode, String rate) {
+    public ExchangeRatesRequestDto(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
         this.baseCurrencyCode = baseCurrencyCode;
         this.targetCurrencyCode = targetCurrencyCode;
         this.rate = rate;
@@ -27,11 +29,11 @@ public class ExchangeRatesRequestDto {
         this.targetCurrencyCode = targetCurrencyCode;
     }
 
-    public String getRate() {
+    public BigDecimal getRate() {
         return rate;
     }
 
-    public void setRate(String rate) {
+    public void setRate(BigDecimal rate) {
         this.rate = rate;
     }
 }

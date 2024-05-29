@@ -7,10 +7,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import main.java.com.danyatheworst.exceptions.InvalidParameterException;
+import main.java.com.danyatheworst.exceptions.NotFoundException;
+import main.java.com.danyatheworst.utils.ConvertingUtils;
 import main.java.com.danyatheworst.utils.MappingUtils;
+import main.java.com.danyatheworst.utils.ParsingUtils;
 import main.java.com.danyatheworst.utils.ValidationUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +40,10 @@ public class ExchangeRateServlet extends HttpServlet {
         ValidationUtils.validateCurrencyCode(baseCurrencyCode);
         ValidationUtils.validateCurrencyCode(targetCurrencyCode);
 
-        ExchangeRate exchangeRate = this.exchangeRateRepository.findByCodes(baseCurrencyCode, targetCurrencyCode);
+        ExchangeRate exchangeRate = this.exchangeRateRepository.
+                findByCodes(baseCurrencyCode, targetCurrencyCode)
+                .orElseThrow(() -> new NotFoundException("Exchange rate "
+                        + baseCurrencyCode + " - " + targetCurrencyCode + " is not present in the database"));
         resp.setStatus(HttpServletResponse.SC_OK);
         gson.toJson(MappingUtils.convertToDto(exchangeRate), resp.getWriter());
     }
@@ -45,14 +52,14 @@ public class ExchangeRateServlet extends HttpServlet {
         String currencyCodes = getCurrencyCodes(req);
         String baseCurrencyCode = currencyCodes.substring(0, 3);
         String targetCurrencyCode = currencyCodes.substring(3);
-        String formString = req.getReader().readLine();
-        if (formString == null || !formString.contains("rate")) {
+        String formFields = req.getReader().readLine();
+        if (formFields == null || !formFields.contains("rate")) {
             throw new InvalidParameterException("Missing parameter — rate");
         }
-        Map<String, String> form = parseFormStringToMap(formString);
-
+        Map<String, String> form = ParsingUtils.parse(formFields);
+        BigDecimal rate = ConvertingUtils.convert(form.get("rate"), "Rate must be a number");
         ExchangeRatesRequestDto exchangeRateRequestDto = new ExchangeRatesRequestDto(
-                baseCurrencyCode, targetCurrencyCode, form.get("rate")
+                baseCurrencyCode, targetCurrencyCode, rate
         );
         ValidationUtils.validate(exchangeRateRequestDto);
 
@@ -67,17 +74,5 @@ public class ExchangeRateServlet extends HttpServlet {
             throw new InvalidParameterException("Currency codes must be in ISO 4217 format");
         }
         return currencyCodes;
-    }
-
-    private static Map<String, String> parseFormStringToMap(String formString) {
-        Map<String, String> map = new HashMap<>();
-        String[] pairs = formString.split("&");
-        for (String pair : pairs) {
-            String[] keyValue = pair.split("=");
-            String key = keyValue[0];
-            String value = keyValue.length > 1 ? keyValue[1] : "";
-            map.put(key, value);
-        }
-        return map;
     }
 }
