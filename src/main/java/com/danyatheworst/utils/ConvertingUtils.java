@@ -4,7 +4,9 @@ import main.java.com.danyatheworst.exceptions.InvalidParameterException;
 
 import java.math.BigDecimal;
 
-public class ConvertingUtils {
+public final class ConvertingUtils {
+    private ConvertingUtils() {};
+
     public static BigDecimal convert(String string, String exceptionMessage) {
         try {
             return BigDecimal.valueOf(Double.parseDouble(string));

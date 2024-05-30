@@ -7,8 +7,10 @@ import main.java.com.danyatheworst.exchange.ExchangeRate;
 import main.java.com.danyatheworst.exchange.dto.ExchangeRateResponseDto;
 import org.modelmapper.ModelMapper;
 
-public class MappingUtils {
+public final class MappingUtils {
     private static final ModelMapper modelMapper = new ModelMapper();
+
+    private MappingUtils() {};
 
     static {
         modelMapper.createTypeMap(CurrencyRequestDto.class, Currency.class)

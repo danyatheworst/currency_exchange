@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public class CurrencyRepository extends BaseRepository implements CrudRepository<Currency> {
     public List<Currency> findAll() {
-        String query = "select (ID, Code, FullName, Sign) from Currencies";
+        String query = "select ID, Code, FullName, Sign from Currencies";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query);) {
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -28,7 +28,7 @@ public class CurrencyRepository extends BaseRepository implements CrudRepository
     }
 
     public Optional<Currency> findByCode(String code) {
-        String query = "select (ID, Code, FullName, Sign) from Currencies where Code = ?";
+        String query = "select ID, Code, FullName, Sign from Currencies where Code = ?";
         try(PreparedStatement preparedStatement = connection.prepareStatement(query);) {
             preparedStatement.setString(1, code);
             ResultSet resultSet = preparedStatement.executeQuery();

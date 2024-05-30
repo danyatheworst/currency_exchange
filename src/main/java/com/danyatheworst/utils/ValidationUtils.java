@@ -10,7 +10,8 @@ import java.util.Currency;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ValidationUtils {
+public final class ValidationUtils {
+    private ValidationUtils() {};
 
     private static Set<String> currencyCodes;
 

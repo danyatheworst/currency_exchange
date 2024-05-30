@@ -3,7 +3,9 @@ package main.java.com.danyatheworst.utils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ParsingUtils {
+public final class ParsingUtils {
+    private ParsingUtils() {};
+
     public static Map<String, String> parse(String formFields) {
         Map<String, String> map = new HashMap<>();
         String[] pairs = formFields.split("&");
