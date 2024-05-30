@@ -3,12 +3,7 @@ package main.java.com.danyatheworst.exchange;
 import main.java.com.danyatheworst.currency.Currency;
 import main.java.com.danyatheworst.currency.CurrencyRepository;
 import main.java.com.danyatheworst.exceptions.NotFoundException;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Optional;
-
-import static java.math.MathContext.DECIMAL64;
+import main.java.com.danyatheworst.exchange.dto.ExchangeRatesRequestDto;
 
 public class ExchangeRateService {
     private final CurrencyRepository currencyRepository = new CurrencyRepository();

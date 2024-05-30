@@ -3,6 +3,8 @@ package main.java.com.danyatheworst.exchange;
 import main.java.com.danyatheworst.currency.Currency;
 import main.java.com.danyatheworst.currency.CurrencyRepository;
 import main.java.com.danyatheworst.exceptions.NotFoundException;
+import main.java.com.danyatheworst.exchange.dto.ExchangeDto;
+import main.java.com.danyatheworst.exchange.dto.ExchangeRequestDto;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

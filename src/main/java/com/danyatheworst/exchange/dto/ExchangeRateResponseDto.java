@@ -1,8 +1,8 @@
-package main.java.com.danyatheworst.exchange;
+package main.java.com.danyatheworst.exchange.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import main.java.com.danyatheworst.currency.CurrencyResponseDto;
+import main.java.com.danyatheworst.currency.dto.CurrencyResponseDto;
 
 import java.math.BigDecimal;
 

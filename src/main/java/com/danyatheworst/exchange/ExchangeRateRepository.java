@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public class ExchangeRateRepository extends BaseRepository implements CrudRepository<ExchangeRate> {
     public List<ExchangeRate> findAll() {
-        String sql =
+        String query =
                 """
                         SELECT
                             er.ID as id,
@@ -35,7 +35,7 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
                         INNER JOIN main.Currencies bc on er.BaseCurrencyId=bc.ID
                         INNER JOIN main.Currencies tc on er.TargetCurrencyId=tc.ID;
                         """;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<ExchangeRate> exchangeRates = new ArrayList<>();
 
@@ -49,7 +49,7 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
     }
 
     public Optional<ExchangeRate> findByCodes(String baseCurrencyCode, String targetCurrencyCode) {
-        String sql = """
+        String query = """
                         SELECT
                             er.ID as id,
                             bc.ID as baseId,
@@ -66,7 +66,7 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
                         INNER JOIN main.Currencies tc on er.TargetCurrencyId=tc.ID
                         WHERE bc.Code = ? AND tc.Code = ?;
                         """;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, baseCurrencyCode);
             preparedStatement.setString(2, targetCurrencyCode);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -81,8 +81,8 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
     }
 
     public ExchangeRate save(ExchangeRate exchangeRate) {
-        String sql = "INSERT INTO ExchangeRates (baseCurrencyId, targetCurrencyId, Rate) VALUES (?, ?, ?) RETURNING id";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String query = "INSERT INTO ExchangeRates (baseCurrencyId, targetCurrencyId, Rate) VALUES (?, ?, ?) RETURNING id";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, exchangeRate.getBaseCurrency().getId());
             preparedStatement.setInt(2, exchangeRate.getTargetCurrency().getId());
             preparedStatement.setBigDecimal(3, exchangeRate.getRate());
@@ -104,8 +104,8 @@ public class ExchangeRateRepository extends BaseRepository implements CrudReposi
     public ExchangeRate update(ExchangeRate exchangeRate) {
         Currency baseCurrency = exchangeRate.getBaseCurrency();
         Currency targetCurrency = exchangeRate.getTargetCurrency();
-        String sql = "UPDATE ExchangeRates SET rate = ? WHERE BaseCurrencyId = ? AND TargetCurrencyId = ? RETURNING ID";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String query = "UPDATE ExchangeRates SET rate = ? WHERE BaseCurrencyId = ? AND TargetCurrencyId = ? RETURNING ID";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setBigDecimal(1, exchangeRate.getRate());
             preparedStatement.setInt(2, baseCurrency.getId());
             preparedStatement.setInt(3, targetCurrency.getId());

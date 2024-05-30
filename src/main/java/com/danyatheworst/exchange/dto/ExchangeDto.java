@@ -1,4 +1,4 @@
-package main.java.com.danyatheworst.exchange;
+package main.java.com.danyatheworst.exchange.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

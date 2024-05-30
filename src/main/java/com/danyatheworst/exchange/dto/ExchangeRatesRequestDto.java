@@ -1,4 +1,4 @@
-package main.java.com.danyatheworst.exchange;
+package main.java.com.danyatheworst.exchange.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,11 +6,11 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Getter
 @Setter
+@Getter
 @AllArgsConstructor
-public class ExchangeRequestDto {
+public class ExchangeRatesRequestDto {
     private String baseCurrencyCode;
     private String targetCurrencyCode;
-    private BigDecimal amount;
+    private BigDecimal rate;
 }

@@ -1,9 +1,9 @@
 package main.java.com.danyatheworst.utils;
 
-import main.java.com.danyatheworst.currency.CurrencyRequestDto;
+import main.java.com.danyatheworst.currency.dto.CurrencyRequestDto;
 import main.java.com.danyatheworst.exceptions.InvalidParameterException;
-import main.java.com.danyatheworst.exchange.ExchangeRatesRequestDto;
-import main.java.com.danyatheworst.exchange.ExchangeRequestDto;
+import main.java.com.danyatheworst.exchange.dto.ExchangeRatesRequestDto;
+import main.java.com.danyatheworst.exchange.dto.ExchangeRequestDto;
 
 import java.math.BigDecimal;
 import java.util.Currency;

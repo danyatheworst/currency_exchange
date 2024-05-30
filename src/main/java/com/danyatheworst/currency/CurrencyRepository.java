@@ -13,7 +13,8 @@ import java.util.Optional;
 
 public class CurrencyRepository extends BaseRepository implements CrudRepository<Currency> {
     public List<Currency> findAll() {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("select * from Currencies");) {
+        String query = "select (ID, Code, FullName, Sign) from Currencies";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query);) {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             List<Currency> currencies = new ArrayList<>();
@@ -27,9 +28,8 @@ public class CurrencyRepository extends BaseRepository implements CrudRepository
     }
 
     public Optional<Currency> findByCode(String code) {
-        try(PreparedStatement preparedStatement = connection.prepareStatement(
-                "select * from Currencies where Code = ?"
-        );) {
+        String query = "select (ID, Code, FullName, Sign) from Currencies where Code = ?";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(query);) {
             preparedStatement.setString(1, code);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -42,9 +42,8 @@ public class CurrencyRepository extends BaseRepository implements CrudRepository
     }
 
     public Currency save(Currency currency) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO currencies (Code, FullName, Sign) VALUES (?, ?, ?) RETURNING *"
-        )) {
+        String query = "INSERT INTO currencies (Code, FullName, Sign) VALUES (?, ?, ?) RETURNING *";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, currency.getCode());
             preparedStatement.setString(2, currency.getFullName());
             preparedStatement.setString(3, currency.getSign());

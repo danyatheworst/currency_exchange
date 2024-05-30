@@ -1,4 +1,4 @@
-package main.java.com.danyatheworst.currency;
+package main.java.com.danyatheworst.currency.dto;
 
 import lombok.Getter;
 import lombok.Setter;

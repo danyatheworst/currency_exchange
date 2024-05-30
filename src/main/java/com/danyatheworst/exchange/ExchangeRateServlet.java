@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import main.java.com.danyatheworst.exceptions.InvalidParameterException;
 import main.java.com.danyatheworst.exceptions.NotFoundException;
+import main.java.com.danyatheworst.exchange.dto.ExchangeRatesRequestDto;
 import main.java.com.danyatheworst.utils.ConvertingUtils;
 import main.java.com.danyatheworst.utils.MappingUtils;
 import main.java.com.danyatheworst.utils.ParsingUtils;
@@ -15,7 +16,6 @@ import main.java.com.danyatheworst.utils.ValidationUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Map;
 
 @WebServlet(name = "ExchangeRateServlet", urlPatterns = {"/exchangeRate/*"})
